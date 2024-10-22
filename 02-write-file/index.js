@@ -1,30 +1,20 @@
 const fs = require('fs');
-const readline = require('readline');
 const path = require('path');
-const process = require('process');
+const { stdin } = process;
 
 const filePath = path.join(__dirname, 'text.txt');
 
-console.log('Приветствую! Введите текст для записи в файл.');
+const writeStream = fs.createWriteStream(filePath);
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-rl.on('line', (input) => {
-  if (input.toLowerCase() === 'exit') {
-    rl.close();
+console.log('Hi, enter the text');
+stdin.on('data', (chunk) => {
+  if (chunk.toString().toUpperCase().includes('EXIT')) {
+    process.exit();
   } else {
-    fs.appendFile(filePath, input + '\n', (err) => {
-      if (err) throw err;
-      console.log(`Текст "${input}" успешно записан в файл!`);
-      console.log('Введите текст или введите "exit" для выхода.');
-    });
+    writeStream.write(chunk);
+    console.log('enter the text or "exit" to end the process');
   }
 });
-
-rl.on('close', () => {
-  console.log('Запись текста в файл завершена.');
-  process.exit(0);
-});
+process.on('error', (error) => console.log('Error', error.message));
+process.on('SIGINT', () => process.exit());
+process.on('exit', () => console.log('\nText is written, by'));

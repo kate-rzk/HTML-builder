@@ -1,26 +1,23 @@
-const fs = require('fs/promises');
+const fs = require('fs');
 const path = require('path');
+const { stdout } = process;
 
-const folderPath = './03-files-in-folder/secret-folder';
-
-fs.readdir(folderPath)
-  .then((files) => {
-    files.forEach((fileName) => {
-      const fileFullPath = path.join(folderPath, fileName);
-
-      fs.stat(fileFullPath)
-        .then((stats) => {
-          if (stats.isFile()) {
-            const extensionName = path.extname(fileName);
-            const fileSize = stats.size;
-            const fileSizeInKb = fileSize / 1024;
-
-            console.log(
-              `${fileName}-${extensionName}-${fileSizeInKb.toFixed(3)}kb`,
-            );
-          }
-        })
-        .catch((err) => console.error(err));
+const pathFolder = path.join(__dirname, 'secret-folder');
+fs.readdir(pathFolder, { withFilesType: true }, (err, files) => {
+  stdout.write('\nCurrent directory files:\n');
+  if (err) stdout.write(err);
+  else {
+    files.forEach((file) => {
+      const fileFullPath = path.join(pathFolder, file);
+      fs.stat(fileFullPath, (err, stats) => {
+        if (err) stdout.write(err);
+        else if (stats.isFile()) {
+          const extName = path.extname(file).slice(1);
+          const sizeFile = stats.size / 1000;
+          let fileName = path.parse(file).name;
+          stdout.write(`${fileName} - ${extName} - ${sizeFile}kb\n`);
+        }
+      });
     });
-  })
-  .catch((err) => console.error(err));
+  }
+});

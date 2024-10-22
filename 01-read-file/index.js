@@ -1,17 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
+const { stdout, stderr } = process;
 const filePath = path.join(__dirname, 'text.txt');
-const readStream = fs.createReadStream(filePath);
+const readableStream = fs.createReadStream(filePath);
 
-readStream.on('data', (chunk) => {
-  console.log(chunk.toString());
-});
+readableStream.on('data', (chunk) =>
+  stdout.write('Text from "text.txt": \n' + chunk.toString()),
+);
 
-readStream.on('end', () => {
-  console.log('File reading is complete');
-});
+readableStream.on('end', () => stdout.write('File reading is complete\n'));
 
-readStream.on('error', (err) => {
-  console.error(`An error occurred: ${err.message}`);
-});
+readableStream.on('error', (err) =>
+  stderr.write(`An error occurred: ${err.message}`),
+);
