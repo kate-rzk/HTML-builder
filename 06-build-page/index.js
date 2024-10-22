@@ -57,7 +57,7 @@ function replaceTag() {
 }
 
 const writeStream = fs.createWriteStream(
-  path.join(pathBundleFolder, 'styles.css'),
+  path.join(pathBundleFolder, 'style.css'),
 );
 
 function bundleStyle() {
